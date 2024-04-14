@@ -1,11 +1,9 @@
-﻿namespace Api_Ass.Model
+﻿namespace Api_Ass.Model.RequestModel
 {
-    public class User
+    public class UpdateRequestModel
     {
-        public Guid Id = Guid.NewGuid();
         public string? Name { get; set; }
         public string? Email { get; set; }
-        public string? Role = "Customer";
         public string? Password;
     }
 }

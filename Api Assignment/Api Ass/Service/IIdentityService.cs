@@ -8,6 +8,6 @@ namespace Api_Ass.Service
     {
         //User IsValidCrendentials(LoginRequestModel loginRequest);
         User AuthenticateUser(LoginRequestModel loginrequest);
-        string GenerateToken(User user);
+        //string GenerateToken(User user);
     }
 }
