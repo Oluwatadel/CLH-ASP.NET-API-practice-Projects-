@@ -5,22 +5,23 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api_Ass.Controllers
 {
-    //[Authorize]
     [Route("api/users")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class UserManagementController : ControllerBase
     {
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public IActionResult GetAll()
         {
+            //var context = HttpContext;
             var users = Context.users;
             return Ok(users);
         }
 
-        [HttpGet]
-        [Route("{id}")]
-        public IActionResult Detail(Guid id)
+        [HttpGet("{id}")]
+        //[Route]
+        public IActionResult Detail([FromRoute] Guid id)
         {
             var user = Context.users.FirstOrDefault(x => x.Id == id);
             if (user == null)
@@ -30,9 +31,9 @@ namespace Api_Ass.Controllers
             return Ok(user);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public IActionResult Update(Guid id, UpdateRequestModel register)
+        [HttpPut("{id}")]
+        //[Route]
+        public IActionResult Update([FromRoute] Guid id, [FromForm] UpdateRequestModel register)
         {
             var user = Context.users.FirstOrDefault(x => x.Id == id);
             if (user == null)

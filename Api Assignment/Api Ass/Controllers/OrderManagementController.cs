@@ -18,10 +18,10 @@ namespace Api_Ass.Controllers
         }
 
         [HttpGet]
-        [Route("{referenc}")]
-        public IActionResult GetProduct([FromRoute] Guid referenc)
+        [Route("reference")]
+        public IActionResult GetProduct([FromRoute] Guid reference)
         {
-            var product = Context.orders.FirstOrDefault(a => a.ReferenceNo == referenc);
+            var product = Context.orders.FirstOrDefault(a => a.ReferenceNo == reference);
             return Ok(product);
         }
 
@@ -33,20 +33,42 @@ namespace Api_Ass.Controllers
                 return BadRequest();
             }
             var product = Context.products.FirstOrDefault(a => a.Name == request.ProductName);
-            var order = new Order
+            var Customer = Context.users.FirstOrDefault(a => a.Email == request.EmailOfCustomer);
+            if(Customer == null)
             {
-                Product = product,
-                TotalPrice = product.price * request.quantity
-            };
-            return Ok(order);
+                return NotFound();
+            }
+            else
+            {
+                if(Customer.Role != "Customer") return BadRequest();
+                var order = new Order
+                {
+                    Product = product.Name,
+                    EmailOfCustomer = request.EmailOfCustomer,
+                    quantity = request.quantity,
+                    TotalPrice = product.price * request.quantity
+                };
+                Context.orders.Add(order);
+                return Ok(order);
+            }
+            
         }
 
         [HttpPut]
         public IActionResult UpdateOrder(Guid orderReference, OrderRequest request)
         {
             var order = Context.orders.FirstOrDefault(a => a.ReferenceNo == orderReference);
-            order.Product = Context.products.FirstOrDefault(a => a.Name == request.ProductName)!;
-            order.TotalPrice = order.Product.price * request.quantity;
+            if(order != null)
+            {
+                return NotFound();
+            }
+            var product = Context.products.FirstOrDefault(a => a.Name == request.ProductName);
+            if(product == null)
+            {
+                return NotFound();
+            }
+            order.Product = product.Name;
+            order.TotalPrice = product.price * request.quantity;
             return Ok(order.TotalPrice);
         }
 
@@ -56,6 +78,19 @@ namespace Api_Ass.Controllers
             var order = Context.orders.FirstOrDefault(a => a.ReferenceNo == orderReferenceNo);
             Context.orders.Remove(order);
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("id/orders")]
+        public IActionResult GetorderOfACustomer(Guid id)
+        {
+            var customer = Context.users.FirstOrDefault(a => a.Id == id);
+            if(customer.Role != "Customer")
+            {
+                return BadRequest("User is not a customer");
+            }
+            var order = Context.orders.Where(a => a.EmailOfCustomer == customer.Email);
+            return Ok(order);
         }
     }
 }

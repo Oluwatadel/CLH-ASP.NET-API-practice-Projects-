@@ -1,4 +1,6 @@
 ﻿using Api_Ass.Conetext;
+using Api_Ass.Model;
+using Api_Ass.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,19 +11,26 @@ namespace Api_Ass.Controllers
     [ApiController]
     public class RoleManagementController : ControllerBase
     {
+        private readonly IRoleService _roleService;
+
+        public RoleManagementController(IRoleService roleService)
+        {
+            _roleService = roleService;
+        }
+
         [HttpGet]
         public IActionResult GetRoles()
         {
-            var roles = Context.roles;
+            var roles = _roleService.GetAllRoles();
             return Ok(roles);
 
         }
         
         [HttpGet]
         [Route("{id}")]
-        public IActionResult GetRole(Guid id)
+        public IActionResult GetRoles(Guid id)
         {
-            var role = Context.roles.FirstOrDefault(a => a.Id == id);
+            var role = _roleService.GetRole(id);
             if (role == null)
             {
                 return NotFound();
@@ -31,12 +40,13 @@ namespace Api_Ass.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public IActionResult UpdateRole(Guid id, string roleName) 
+        public IActionResult UpdateRole(Guid id, string name)
         {
-            var role = Context.roles.FirstOrDefault(x => x.Id == id);
+            var role = _roleService.GetRole(id);
+
             if (role != null)
             {
-                role.Name = roleName;
+                role.Name = name;
                 return Ok();
             }
             return NotFound();
@@ -47,12 +57,7 @@ namespace Api_Ass.Controllers
         //[Route("{id}")]
         public IActionResult DeleteRole([FromRoute] Guid id) 
         {
-            var role = Context.roles.FirstOrDefault(x => x.Id == id);
-            if (role == null)
-            {
-                return NotFound();
-            }
-            Context.roles.Remove(role);
+            _roleService.DeleteRole(id);
             return Ok();
         }
     }

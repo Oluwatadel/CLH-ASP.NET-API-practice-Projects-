@@ -3,8 +3,9 @@
     public class Order
     {
         public Guid ReferenceNo = Guid.NewGuid();
-        public Product Product { get; set; }
+        public string? Product { get; set; }
+        public int quantity { get; set; }
         public double TotalPrice { get; set; }
-        //public string? EmailOfCustomer { get; set; }
+        public string? EmailOfCustomer { get; set; }
     }
 }
